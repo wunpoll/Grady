@@ -2,7 +2,7 @@
 
 
 a = Analysis(
-    ['code/main.py'],
+    ['code\\main.py'],
     pathex=[],
     binaries=[],
     datas=[('media/*', 'media')],
