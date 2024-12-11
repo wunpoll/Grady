@@ -22,27 +22,22 @@ class TeacherWindow(QMainWindow):
         self.setWindowTitle("Панель учителя")
         self.setGeometry(100, 100, 800, 600)
         
-        # Создаем центральный виджет и общий layout
         central_widget = QWidget()
         self.setCentralWidget(central_widget)
         main_layout = QVBoxLayout(central_widget)
         
-        # Контейнер для списка и информации
         content_layout = QHBoxLayout()
         main_layout.addLayout(content_layout)
 
-        # Создаем контейнер для заголовка и кнопки обновления
         students_header_container = QWidget()
         students_header_container.setFixedWidth(300)  
         students_header_layout = QHBoxLayout(students_header_container)
         students_header_layout.setContentsMargins(5, 5, 5, 5)
 
-        # Добавляем заголовок
         students_title = QLabel("Список учеников")
         students_title.setFont(QFont('', 12, QFont.Weight.Bold))
         students_header_layout.addWidget(students_title)
 
-        # Добавляем кнопку обновления
         refresh_button = QPushButton()
         refresh_button.setIcon(QIcon.fromTheme("view-refresh"))
         refresh_button.setFixedSize(24, 24)
@@ -61,21 +56,17 @@ class TeacherWindow(QMainWindow):
         refresh_button.clicked.connect(self.load_students)
         students_header_layout.addWidget(refresh_button)
 
-        # Создаем левый контейнер для заголовка и списка
         left_container = QVBoxLayout()
         left_container.addWidget(students_header_container)
 
-        # Список учеников
         self.students_list = QListWidget()
         self.students_list.setMaximumWidth(300)
         self.load_students()
         self.students_list.itemClicked.connect(self.show_student_info)
         left_container.addWidget(self.students_list)
 
-        # Добавляем левый контейнер в основной layout
         content_layout.addLayout(left_container)
 
-        # Информация о студенте
         self.info_widget = QWidget()
         self.info_layout = QVBoxLayout(self.info_widget)
         scroll = QScrollArea()
@@ -83,7 +74,6 @@ class TeacherWindow(QMainWindow):
         scroll.setWidgetResizable(True)
         content_layout.addWidget(scroll)
 
-        # Кнопка генерации отчета
         self.export_button = QPushButton("Сформировать отчет Excel")
         self.export_button.setStyleSheet("""
             QPushButton {
@@ -186,13 +176,11 @@ class TeacherWindow(QMainWindow):
         conn = sqlite3.connect(db_path)
         cursor = conn.cursor()
         
-        # Получаем group_id учителя
         cursor.execute("""
             SELECT group_id FROM Teacher WHERE user_id = ?
         """, (self.teacher_id,))
         group_id = cursor.fetchone()[0]
         
-        # Получаем список студентов группы
         cursor.execute("""
             SELECT Student.user_id, Student.last_name, Student.first_name, Student.middle_name 
             FROM Student 
@@ -207,7 +195,6 @@ class TeacherWindow(QMainWindow):
         conn.close()
 
     def show_student_info(self, item):
-        # Очищаем предыдущую информацию
         while self.info_layout.count():
             child = self.info_layout.takeAt(0)
             if child.widget():
@@ -218,7 +205,6 @@ class TeacherWindow(QMainWindow):
         conn = sqlite3.connect(db_path)
         cursor = conn.cursor()
         
-        # Получаем ID студента
         student_name = item.text().split()
         cursor.execute("""
             SELECT user_id FROM Student 
@@ -226,7 +212,6 @@ class TeacherWindow(QMainWindow):
         """, (student_name[0], student_name[1], student_name[2]))
         student_id = cursor.fetchone()[0]
 
-        # Получаем факторы студента
         cursor.execute("""
             SELECT mother_education, father_education, free_time_hours, 
                    additional_activities, olympiads_part 
@@ -236,14 +221,12 @@ class TeacherWindow(QMainWindow):
         factors = cursor.fetchone()
 
         if factors:
-            # Показываем факторы
             self.info_layout.addWidget(QLabel(f"Образование матери: {factors[0]}"))
             self.info_layout.addWidget(QLabel(f"Образование отца: {factors[1]}"))
             self.info_layout.addWidget(QLabel(f"Свободное время (часов): {factors[2]}"))
             self.info_layout.addWidget(QLabel(f"Доп. занятия: {factors[3]}"))
             self.info_layout.addWidget(QLabel(f"Участие в олимпиадах: {factors[4]}"))
 
-            # Получаем оценку из таблицы Grades
             cursor.execute("""
                 SELECT predicted_grade 
                 FROM Grades 
@@ -264,7 +247,7 @@ class TeacherWindow(QMainWindow):
             kpi_label.setStyleSheet(f"QLabel {{ color: {kpi_color}; font-weight: bold; font-size: 14px; }}")
             grade_label.setStyleSheet(f"QLabel {{ color: {grade_color}; font-weight: bold; font-size: 14px; }}")
             
-            self.info_layout.addWidget(QLabel(""))  # Пустая строка для отступа
+            self.info_layout.addWidget(QLabel(""))
             self.info_layout.addWidget(kpi_label)
             self.info_layout.addWidget(grade_label)
 
@@ -278,21 +261,21 @@ class TeacherWindow(QMainWindow):
 
     def get_color_for_kpi(self, kpi):
         if kpi >= 80:
-            return "#2ecc71"  # Зеленый
+            return "#2ecc71" 
         elif kpi >= 60:
-            return "#f1c40f"  # Желтый
+            return "#f1c40f" 
         elif kpi >= 40:
-            return "#e67e22"  # Оранжевый
+            return "#e67e22" 
         else:
-            return "#e74c3c"  # Красный
+            return "#e74c3c"
 
     def get_color_for_grade(self, grade):
         if grade == 5:
-            return "#2ecc71"  # Зеленый
+            return "#2ecc71"  
         elif grade == 4:
-            return "#f1c40f"  # Желтый
+            return "#f1c40f"   
         elif grade == 3:
-            return "#e67e22"  # Оранжевый
+            return "#e67e22"  
         else:
-            return "#e74c3c"  # Красный
+            return "#e74c3c"  
 

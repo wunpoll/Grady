@@ -32,7 +32,6 @@ class StudentWindow(QMainWindow):
         self.setCentralWidget(central_widget)
         self.layout = QVBoxLayout(central_widget)
 
-        # Информация о студенте
         self.student_info = QLabel()
         self.student_info.setStyleSheet("""
             QLabel {
@@ -47,7 +46,6 @@ class StudentWindow(QMainWindow):
         """)
         self.layout.addWidget(self.student_info)
 
-        # Форма факторов
         form_frame = QFrame()
         form_frame.setStyleSheet("""
             QFrame {
@@ -88,34 +86,28 @@ class StudentWindow(QMainWindow):
         form_layout = QFormLayout(form_frame)
         form_layout.setSpacing(15)
 
-        # Образование матери
         self.mother_edu = QComboBox()
         self.mother_edu.addItems(['Высшее', 'Среднее специальное', 'Среднее'])
         form_layout.addRow("Образование матери:", self.mother_edu)
 
-        # Образование отца
         self.father_edu = QComboBox()
         self.father_edu.addItems(['Высшее', 'Среднее специальное', 'Среднее'])
         form_layout.addRow("Образование отца:", self.father_edu)
 
-        # Свободное время
         self.free_time = QSpinBox()
         self.free_time.setRange(0, 12)
         form_layout.addRow("Свободное время (часов):", self.free_time)
 
-        # Дополнительные занятия
         self.additional = QComboBox()
         self.additional.addItems(['Да', 'Нет'])
         form_layout.addRow("Дополнительные занятия:", self.additional)
 
-        # Олимпиады
         self.olympiads = QComboBox()
         self.olympiads.addItems(['Да', 'Нет'])
         form_layout.addRow("Участие в олимпиадах:", self.olympiads)
 
         self.layout.addWidget(form_frame)
 
-       # Кнопка сохранения
         self.save_button = QPushButton("Сохранить")
         self.save_button.setStyleSheet("""
             QPushButton {
@@ -132,12 +124,9 @@ class StudentWindow(QMainWindow):
                 background-color: #005999;
             }
         """)
-        print("Создаем кнопку")  # Проверка создания кнопки
         self.save_button.clicked.connect(self.save_factors)
-        print("Подключили обработчик")  # Проверка подключения обработчика
         self.layout.addWidget(self.save_button)
 
-        # Загружаем данные
         self.load_student_info()
         self.load_factors()
 

@@ -61,21 +61,18 @@ class LoginWindow(QMainWindow):
             }
         """)
 
-        # Центральный виджет
         central_widget = QWidget()
         self.setCentralWidget(central_widget)
         layout = QVBoxLayout(central_widget)
         layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
         layout.setSpacing(15)
 
-        # Email
         self.label_email = QLabel("Email:")
         layout.addWidget(self.label_email)
         self.input_email = QLineEdit()
         self.input_email.setPlaceholderText("Введите email")
         layout.addWidget(self.input_email)
 
-        # Пароль
         self.label_password = QLabel("Пароль:")
         layout.addWidget(self.label_password)
         self.input_password = QLineEdit()
@@ -83,17 +80,14 @@ class LoginWindow(QMainWindow):
         self.input_password.setEchoMode(QLineEdit.EchoMode.Password)
         layout.addWidget(self.input_password)
 
-        # Кнопка входа
         self.button_login = QPushButton("Войти")
-        self.button_login.setFocusPolicy(Qt.FocusPolicy.StrongFocus)  # Делаем доступным через Tab
+        self.button_login.setFocusPolicy(Qt.FocusPolicy.StrongFocus) 
         self.button_login.clicked.connect(self.login)
         layout.addWidget(self.button_login)
 
-        # Устанавливаем порядок перехода по Tab
         self.input_email.setTabOrder(self.input_email, self.input_password)
         self.input_password.setTabOrder(self.input_password, self.button_login)
 
-        # Позволяем нажать Enter для входа
         self.input_password.returnPressed.connect(self.button_login.click)
         self.input_email.returnPressed.connect(lambda: self.input_password.setFocus())
 
@@ -137,7 +131,7 @@ class LoginWindow(QMainWindow):
     def open_admin_window(self):
         self.admin_window = AdminWindow()
         self.admin_window.show()
-        self.close()  # Закрыть окно авторизации
+        self.close()
 
     def open_teacher_window(self, teacher_id):
         from teacher import TeacherWindow

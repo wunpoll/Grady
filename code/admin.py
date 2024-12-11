@@ -28,7 +28,6 @@ class AdminWindow(QMainWindow):
         self.setWindowTitle("Панель администратора")
         self.setGeometry(100, 100, 1000, 700)
         
-        # Применяем темную тему
         self.setStyleSheet("""
             QMainWindow, QDialog {
                 background-color: #1e1e1e;
@@ -120,15 +119,12 @@ class AdminWindow(QMainWindow):
             }
         """)
 
-        # Основной виджет
         central_widget = QWidget()
         self.setCentralWidget(central_widget)
         self.layout = QVBoxLayout(central_widget)
 
-        # Верхняя панель с кнопками и фильтрами
         top_panel = QHBoxLayout()
         
-        # Секция фильтров
         filter_group = QWidget()
         filter_layout = QHBoxLayout(filter_group)
         filter_layout.setContentsMargins(0, 0, 0, 0)
@@ -141,7 +137,6 @@ class AdminWindow(QMainWindow):
         filter_layout.addWidget(self.role_filter)
         filter_layout.addStretch()
 
-        # Секция кнопок
         button_group = QWidget()
         button_layout = QHBoxLayout(button_group)
         button_layout.setContentsMargins(0, 0, 0, 0)
@@ -162,25 +157,24 @@ class AdminWindow(QMainWindow):
         top_panel.addWidget(button_group)
         self.layout.addLayout(top_panel)
 
-        # Таблицы
+  
         self.table_users = QTableWidget()
         self.table_groups = QTableWidget()
 
-        # Настройка таблицы пользователей
+   
         self.table_users.setColumnCount(3)
         self.table_users.setHorizontalHeaderLabels(["ID", "Email", "Роль"])
         self.table_users.horizontalHeader().setSectionResizeMode(1, QHeaderView.ResizeMode.Stretch)
         self.table_users.horizontalHeader().setSectionResizeMode(2, QHeaderView.ResizeMode.ResizeToContents)
         self.table_users.horizontalHeader().sectionClicked.connect(self.sort_table)
 
-        # Настройка таблицы групп
+       
         self.table_groups.setColumnCount(4)
         self.table_groups.setHorizontalHeaderLabels(["ID", "Название", "Специализация", "Учитель"])
         self.table_groups.horizontalHeader().setSectionResizeMode(1, QHeaderView.ResizeMode.ResizeToContents)
         self.table_groups.horizontalHeader().setSectionResizeMode(2, QHeaderView.ResizeMode.Stretch)
         self.table_groups.horizontalHeader().setSectionResizeMode(3, QHeaderView.ResizeMode.Stretch)
 
-        # Добавление заголовков секций
         users_label = QLabel("Пользователи:")
         users_label.setStyleSheet("font-size: 16px; font-weight: bold; margin-top: 10px;")
         groups_label = QLabel("Группы:")
@@ -191,10 +185,8 @@ class AdminWindow(QMainWindow):
         self.layout.addWidget(groups_label)
         self.layout.addWidget(self.table_groups)
 
-        # Загрузка данных
         self.load_data()
 
-        # Подключение сигналов
         self.table_groups.cellDoubleClicked.connect(self.edit_group)
         self.table_users.cellDoubleClicked.connect(self.edit_user)
         self.table_users.setEditTriggers(QTableWidget.EditTrigger.NoEditTriggers)
@@ -202,39 +194,37 @@ class AdminWindow(QMainWindow):
 
 
     def sort_table(self, column):
-        if column == 2:  # Колонка "Роль"
-            # Сохраняем текущий порядок сортировки
+        if column == 2:
             if not hasattr(self, 'sort_order'):
                 self.sort_order = Qt.SortOrder.AscendingOrder
             else:
                 self.sort_order = Qt.SortOrder.DescendingOrder if self.sort_order == Qt.SortOrder.AscendingOrder else Qt.SortOrder.AscendingOrder
 
-            # Определяем порядок сортировки ролей
             role_order = {
                 'administrator': 0,
                 'teacher': 1,
                 'student': 2
             }
 
-            # Получаем все строки из таблицы
+            
             items = []
             for row in range(self.table_users.rowCount()):
                 items.append([
-                    self.table_users.item(row, 0).text(),  # ID
-                    self.table_users.item(row, 1).text(),  # Email
-                    self.table_users.item(row, 2).text(),  # Role
-                    row  # Сохраняем оригинальную позицию
+                    self.table_users.item(row, 0).text(),
+                    self.table_users.item(row, 1).text(), 
+                    self.table_users.item(row, 2).text(), 
+                    row 
                 ])
 
-            # Сортируем
+          
             items.sort(
                 key=lambda x: role_order.get(x[2].lower(), 999),
                 reverse=(self.sort_order == Qt.SortOrder.DescendingOrder)
             )
 
-            # Обновляем таблицу
+             
             for new_row, item in enumerate(items):
-                for col in range(3):  # Только первые три колонки
+                for col in range(3):   
                     self.table_users.item(item[3], col).setText(item[col])
 
     def generate_password(self):
@@ -345,8 +335,7 @@ class AdminWindow(QMainWindow):
         db_path = resource_path("Grady.db")
         conn = sqlite3.connect(db_path)
         cursor = conn.cursor()
-
-        # Загрузка пользователей
+ 
         selected_role = self.role_filter.currentText()
         if selected_role == "Все роли":
             cursor.execute("""
@@ -376,7 +365,7 @@ class AdminWindow(QMainWindow):
             self.table_users.setItem(row_index, 1, QTableWidgetItem(email))
             self.table_users.setItem(row_index, 2, QTableWidgetItem(role))
 
-        # Загрузка групп остается без изменений
+ 
         cursor.execute("""
             SELECT g.id, g.name, g.specialization, 
                 COALESCE(t.first_name || ' ' || t.last_name, 'Нет учителя') AS teacher
@@ -516,15 +505,14 @@ class AddUserDialog(QDialog):
 
         layout = QVBoxLayout()
         layout.setSpacing(10)
-
-        # Email
+ 
         self.label_email = QLabel("Email:")
         self.input_email = QLineEdit()
         self.input_email.setPlaceholderText("Введите email")
         layout.addWidget(self.label_email)
         layout.addWidget(self.input_email)
 
-        # Password section
+ 
         password_widget = QWidget()
         password_layout = QHBoxLayout(password_widget)
         password_layout.setContentsMargins(0, 0, 0, 0)
@@ -551,7 +539,6 @@ class AddUserDialog(QDialog):
         layout.addWidget(self.label_password)
         layout.addWidget(password_widget)
 
-        # Role section
         role_label = QLabel("Роль:")
         layout.addWidget(role_label)
 
@@ -573,13 +560,12 @@ class AddUserDialog(QDialog):
         role_layout.addWidget(self.radio_teacher)
         role_layout.addWidget(self.radio_admin)
         layout.addWidget(role_widget)
-
-        # Personal info section
+ 
         self.personal_info_widget = QWidget()
         personal_layout = QVBoxLayout(self.personal_info_widget)
         personal_layout.setContentsMargins(0, 0, 0, 0)
 
-        # ФИО
+ 
         self.label_last_name = QLabel("Фамилия:")
         self.input_last_name = QLineEdit()
         self.input_last_name.setPlaceholderText("Введите фамилию")
@@ -601,7 +587,7 @@ class AddUserDialog(QDialog):
 
         layout.addWidget(self.personal_info_widget)
 
-        # Group selection (for students)
+ 
         self.group_widget = QWidget()
         group_layout = QVBoxLayout(self.group_widget)
         group_layout.setContentsMargins(0, 0, 0, 0)
@@ -615,20 +601,16 @@ class AddUserDialog(QDialog):
         
         layout.addWidget(self.group_widget)
 
-        # Save button
+ 
         self.button_save = QPushButton("Сохранить")
         self.button_save.clicked.connect(self.add_user)
         layout.addWidget(self.button_save)
 
         self.setLayout(layout)
         
-        # Connect signals
+    
         self.role_group.buttonClicked.connect(self.update_fields)
-        
-        # Load groups
         self.load_groups()
-        
-        # Initial update
         self.update_fields()
 
     def load_groups(self):
@@ -695,11 +677,9 @@ class AddUserDialog(QDialog):
             db_path = resource_path("Grady.db")
             conn = sqlite3.connect(db_path)
             cursor = conn.cursor()
-            
-            # Начинаем транзакцию
+       
             cursor.execute("BEGIN TRANSACTION")
             
-            # Проверяем существование email внутри транзакции
             cursor.execute("SELECT id FROM Users WHERE email = ?", (email,))
             if cursor.fetchone():
                 raise ValueError("Пользователь с таким email уже существует")
@@ -711,14 +691,12 @@ class AddUserDialog(QDialog):
             else:
                 role = 'administrator'
 
-            # Добавляем пользователя
             cursor.execute(
                 "INSERT INTO Users (email, password, role) VALUES (?, ?, ?)",
                 (email, password, role)
             )
             user_id = cursor.lastrowid
 
-            # Добавляем дополнительную информацию в зависимости от роли
             if role in ['student', 'teacher']:
                 first_name = self.input_first_name.text().strip()
                 last_name = self.input_last_name.text().strip()
@@ -765,7 +743,6 @@ class EditUserDialog(QDialog):
         self.user_id = user_id
         self.role = role
         
-        # Применяем тот же стиль, что и в AddUserDialog
         self.setStyleSheet("""
             QDialog {
                 background-color: #1e1e1e;
@@ -803,8 +780,6 @@ class EditUserDialog(QDialog):
         layout = QVBoxLayout()
         layout.setSpacing(10)
 
-        
-        # Email
         self.label_email = QLabel("Email:")
         self.input_email = QLineEdit()
         layout.addWidget(self.label_email)
@@ -873,17 +848,15 @@ class EditUserDialog(QDialog):
         conn = sqlite3.connect(db_path)
         cursor = conn.cursor()
 
-        print(f"Loading data for user_id: {self.user_id}, role: {self.role}")  # Отладочный принт
+        print(f"Loading data for user_id: {self.user_id}, role: {self.role}")
 
-        # Загружаем email
         cursor.execute("SELECT email FROM Users WHERE id = ?", (self.user_id,))
         user_data = cursor.fetchone()
-        print(f"Email data: {user_data}")  # Отладочный принт
+        print(f"Email data: {user_data}") 
 
         if user_data:
             self.input_email.setText(user_data[0])
 
-        # Загружаем дополнительные данные в зависимости от роли
         if self.role == 'student':
             cursor.execute("""
                 SELECT first_name, last_name, middle_name, group_id
@@ -891,7 +864,7 @@ class EditUserDialog(QDialog):
                 WHERE user_id = ?
             """, (self.user_id,))
             data = cursor.fetchone()
-            print(f"Student data: {data}")  # Отладочный принт
+            print(f"Student data: {data}") 
             
             if data:
                 self.input_first_name.setText(data[0])
@@ -908,7 +881,7 @@ class EditUserDialog(QDialog):
                 WHERE user_id = ?
             """, (self.user_id,))
             data = cursor.fetchone()
-            print(f"Teacher data: {data}")  # Отладочный принт
+            print(f"Teacher data: {data}")
             
             if data:
                 self.input_first_name.setText(data[0])
@@ -933,13 +906,11 @@ class EditUserDialog(QDialog):
                 
                 cursor.execute("BEGIN TRANSACTION")
                 
-                # Удаляем связанные записи в зависимости от роли
                 if self.role == 'student':
                     cursor.execute("DELETE FROM Student WHERE user_id = ?", (self.user_id,))
                 elif self.role == 'teacher':
                     cursor.execute("DELETE FROM Teacher WHERE user_id = ?", (self.user_id,))
                 
-                # Удаляем пользователя
                 cursor.execute("DELETE FROM Users WHERE id = ?", (self.user_id,))
                 
                 cursor.execute("COMMIT")
@@ -965,11 +936,9 @@ class EditUserDialog(QDialog):
             
             cursor.execute("BEGIN TRANSACTION")
 
-            # Обновляем email
             cursor.execute("UPDATE Users SET email = ? WHERE id = ?", 
                          (email, self.user_id))
 
-            # Обновляем дополнительные данные
             if self.role == 'student':
                 first_name = self.input_first_name.text().strip()
                 last_name = self.input_last_name.text().strip()
@@ -1055,28 +1024,24 @@ class AddGroupDialog(QDialog):
         layout = QVBoxLayout()
         layout.setSpacing(15)
 
-        # Название группы
         self.label_group_name = QLabel("Название группы:")
         self.input_group_name = QLineEdit()
         self.input_group_name.setPlaceholderText("Введите название группы")
         layout.addWidget(self.label_group_name)
         layout.addWidget(self.input_group_name)
 
-        # Специализация
         self.label_specialization = QLabel("Специализация:")
         self.input_specialization = QLineEdit()
         self.input_specialization.setPlaceholderText("Введите специализацию")
         layout.addWidget(self.label_specialization)
         layout.addWidget(self.input_specialization)
 
-        # Учитель
         self.label_teacher = QLabel("Учитель:")
         self.combo_teacher = QComboBox()
         self.combo_teacher.addItem("Без учителя", -1)
         layout.addWidget(self.label_teacher)
         layout.addWidget(self.combo_teacher)
 
-        # Кнопка добавления
         self.button_add = QPushButton("Добавить группу")
         self.button_add.clicked.connect(self.add_group)
         layout.addWidget(self.button_add)
@@ -1088,7 +1053,6 @@ class AddGroupDialog(QDialog):
         db_path = resource_path("Grady.db")
         conn = sqlite3.connect(db_path)
         cursor = conn.cursor()
-        # Загружаем только свободных учителей
         cursor.execute("""
             SELECT user_id, first_name || ' ' || last_name as full_name
             FROM Teacher 
@@ -1114,14 +1078,12 @@ class AddGroupDialog(QDialog):
             
             cursor.execute("BEGIN TRANSACTION")
 
-            # Добавляем группу
             cursor.execute(
                 "INSERT INTO Groups (name, specialization) VALUES (?, ?)",
                 (name, specialization)
             )
             group_id = cursor.lastrowid
 
-            # Назначаем учителя, если выбран
             if teacher_id != -1:
                 cursor.execute(
                     "UPDATE Teacher SET group_id = ? WHERE user_id = ?",
@@ -1191,26 +1153,22 @@ class EditGroupDialog(QDialog):
         layout = QVBoxLayout()
         layout.setSpacing(15)
 
-        # Название группы
         self.label_group_name = QLabel("Название группы:")
         self.input_group_name = QLineEdit(group_name)
         layout.addWidget(self.label_group_name)
         layout.addWidget(self.input_group_name)
 
-        # Специализация
         self.label_specialization = QLabel("Специализация:")
         self.input_specialization = QLineEdit(specialization)
         layout.addWidget(self.label_specialization)
         layout.addWidget(self.input_specialization)
 
-        # Учитель
         self.label_teacher = QLabel("Учитель:")
         self.combo_teacher = QComboBox()
         self.combo_teacher.addItem("Без учителя", -1)
         layout.addWidget(self.label_teacher)
         layout.addWidget(self.combo_teacher)
 
-        # Кнопки
         button_layout = QHBoxLayout()
         
         self.button_save = QPushButton("Сохранить изменения")
@@ -1231,7 +1189,6 @@ class EditGroupDialog(QDialog):
         db_path = resource_path("Grady.db")
         conn = sqlite3.connect(db_path)
         cursor = conn.cursor()
-        # Загружаем свободных учителей и текущего учителя группы
         cursor.execute("""
             SELECT user_id, first_name || ' ' || last_name as full_name
             FROM Teacher 
@@ -1259,21 +1216,18 @@ class EditGroupDialog(QDialog):
             
             cursor.execute("BEGIN TRANSACTION")
 
-            # Обновляем информацию о группе
             cursor.execute("""
                 UPDATE Groups 
                 SET name = ?, specialization = ?
                 WHERE id = ?
             """, (name, specialization, self.group_id))
 
-            # Сначала убираем привязку текущего учителя
             cursor.execute("""
                 UPDATE Teacher 
                 SET group_id = NULL 
                 WHERE group_id = ?
             """, (self.group_id,))
 
-            # Назначаем нового учителя, если выбран
             if new_teacher_id != -1:
                 cursor.execute("""
                     UPDATE Teacher 
@@ -1310,7 +1264,6 @@ class EditGroupDialog(QDialog):
                 
                 cursor.execute("BEGIN TRANSACTION")
 
-                # Отвязываем учителя
                 cursor.execute("""
                     UPDATE Teacher 
                     SET group_id = NULL 
@@ -1323,7 +1276,6 @@ class EditGroupDialog(QDialog):
                     WHERE group_id = ?
                 """, (self.group_id,))
 
-                # Удаляем группу
                 cursor.execute("DELETE FROM Groups WHERE id = ?", (self.group_id,))
 
                 cursor.execute("COMMIT")
